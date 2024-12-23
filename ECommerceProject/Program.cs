@@ -35,19 +35,30 @@ var sampleTodos = new Todo[]
     new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
 };
 
-var todosApi = app.MapGroup("/products");
-todosApi.MapGet("/", () => sampleTodos);
-todosApi.MapGet(
+var productsApi = app.MapGroup("/products");
+productsApi.MapGet("/", (ECommerceDbContext db) => {
+    var res = db.Products.ToList();
+    return Results.Ok(res);
+});
+
+productsApi.MapGet(
     "/{id}",
-    (int id) =>
-        sampleTodos.FirstOrDefault(a => a.Id == id) is { } todo
-            ? Results.Ok(todo)
-            : Results.NotFound()
+    (ECommerceDbContext db, int id) =>
+        db.Products.Find(id) is Product product ? Results.Ok(product) : Results.NotFound()
 );
+
+productsApi.MapPost("/", (ECommerceDbContext db, Product product) =>
+{
+    db.Products.Add(product);
+    db.SaveChanges();
+    return Results.Created($"/products/{product.ProductId}", product);
+});
 
 app.Run();
 
 public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
 
-[JsonSerializable(typeof(Todo[]))]
+[JsonSerializable(typeof(Product))]
+[JsonSerializable(typeof(Product[]))]
+[JsonSerializable(typeof(User))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext { }
