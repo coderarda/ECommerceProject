@@ -11,6 +11,10 @@ public partial class Product
 
     public int ProductPrice { get; set; }
 
+    public string? ProductCategory { get; set; }
+
+    public byte[] ProductImage { get; set; } = null!;
+
     public string? ProductDescription { get; set; }
 
     public int CommentCommentId { get; set; }
