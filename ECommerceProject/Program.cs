@@ -26,15 +26,6 @@ builder.Services.AddDbContext<ECommerceDbContext>(options =>
 
 var app = builder.Build();
 
-var sampleTodos = new Todo[]
-{
-    new(1, "Walk the dog"),
-    new(2, "Do the dishes", DateOnly.FromDateTime(DateTime.Now)),
-    new(3, "Do the laundry", DateOnly.FromDateTime(DateTime.Now.AddDays(1))),
-    new(4, "Clean the bathroom"),
-    new(5, "Clean the car", DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
-};
-
 var productsApi = app.MapGroup("/products");
 productsApi.MapGet("/", (ECommerceDbContext db) => {
     var res = db.Products.ToList();
@@ -54,9 +45,11 @@ productsApi.MapPost("/", (ECommerceDbContext db, Product product) =>
     return Results.Created($"/products/{product.ProductId}", product);
 });
 
-app.Run();
+var usersApi = app.MapGroup("/users");
 
-public record Todo(int Id, string? Title, DateOnly? DueBy = null, bool IsComplete = false);
+
+
+app.Run();
 
 [JsonSerializable(typeof(Product))]
 [JsonSerializable(typeof(Product[]))]
